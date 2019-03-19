@@ -51,22 +51,12 @@ class ModelsTest(TestCase):
         return Organization.objects.create(company_name=company_name, location=location, description=description)
 
     @staticmethod
-    def create_employee(emp_name='mona', emp_username='mona@gmail.com', emp_password='mona@123',
+    def create_employee(emp_name='shradha', emp_username='shradha@gmail.com', emp_password='Shradha@1234',
                         emp_designation='Software Engineer',
                         emp_address='Pune', organization=None):
         return Employee.objects.create(emp_name=emp_name, emp_username=emp_username, emp_password=emp_password,
                                        emp_designation=emp_designation, emp_address=emp_address,
                                        organization=organization)
-
-    @staticmethod
-    def create_survey(survey_name='CSR Activity', description='CSR for harbinger',
-                      organization=Organization.objects.get(id=1), question=Question.objects.get(id=1),
-                      employee=Employee.objects.get(id=1),
-                      start_date_time='2019-02-28',
-                      end_date_time='2019-02-28', flag=True):
-        return Survey.objects.create(survey_name=survey_name, description=description,
-                                     organization=organization, question=question, employee=employee,
-                                     startDatetime=start_date_time, endDatetime=end_date_time, flag=flag)
 
     @staticmethod
     def create_user(organization=None, is_active=True, is_staff=False):
@@ -91,11 +81,6 @@ class ModelsTest(TestCase):
         user = self.create_user()
         self.assertTrue(isinstance(user, User))
 
-        survey = self.create_survey()
-        self.assertEqual(survey.__str__(), survey.survey_name)
-        self.assertTrue(isinstance(survey, Survey))
-        self.assertEqual(str(Survey._meta.verbose_name_plural), "surveys")
-
         question = self.create_question()
         self.assertTrue(isinstance(question, Question))
         self.assertEqual(question.__str__(), question.question)
@@ -108,7 +93,7 @@ class TestLogin(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
 
-    def test_homepage_fire(self):
+    def test_login_gateway_fire(self):
         self.driver.get("http://127.0.0.1:8000/")
         self.assertIn("http://127.0.0.1:8000/", self.driver.current_url)
 
@@ -122,10 +107,6 @@ class TestLogin(unittest.TestCase):
     def test_login_url_fire(self):
         self.driver.get("http://127.0.0.1:8000/login/")
         self.assertIn("http://127.0.0.1:8000/login/", self.driver.current_url)
-
-    def test_report_url_fire(self):
-        self.driver.get('http://127.0.0.1:8000/report/')
-        self.assertIn('http://127.0.0.1:8000/report/', self.driver.current_url)
 
     def tearDown(self):
         self.driver.quit()

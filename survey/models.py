@@ -6,7 +6,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - '
+                           '%(message)s', level=logging.INFO)
 
 
 class Organization(models.Model):
@@ -25,7 +26,9 @@ class User(AbstractUser):
     """
     This is user class which overrides Abstract User
     """
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, null=True)
+    organization = models.ForeignKey(Organization,
+                                     on_delete=models.CASCADE,
+                                     blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=True)
 
@@ -42,7 +45,8 @@ class Employee(models.Model):
     emp_password = models.CharField(max_length=100)
     emp_designation = models.CharField(max_length=100)
     emp_address = models.CharField(max_length=200)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, null=True)
+    organization = models.ForeignKey(Organization,
+                                     on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.emp_name
@@ -94,7 +98,8 @@ class Survey(models.Model):
     """
     survey_name = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization,
+                                     on_delete=models.CASCADE)
     question = models.ManyToManyField(Question)
     employee = models.ManyToManyField(Employee)
     startDatetime = models.DateField(blank=True, null=True)

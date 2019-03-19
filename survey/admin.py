@@ -1,12 +1,11 @@
 import logging
-from smtplib import SMTPAuthenticationError
-
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.core.mail import EmailMessage
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
+from smtplib import SMTPAuthenticationError
 from .models import Employee, Organization, Survey, Question, SurveyFeedback, User
-from django.core.mail import EmailMessage
 
 
 logger = logging.getLogger(__name__)
@@ -16,7 +15,9 @@ logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 class UserResource(resources.ModelResource):
     class Meta:
         model = Employee
-        fields = ('id', 'emp_name', 'emp_username', 'emp_password', 'emp_designation', 'emp_address', 'organization')
+        fields = ('id', 'emp_name', 'emp_username',
+                  'emp_password', 'emp_designation',
+                  'emp_address', 'organization')
         export_order = fields
         skip_unchanged = True
         report_skipped = True
@@ -25,22 +26,29 @@ class UserResource(resources.ModelResource):
 class EmployeeResource(resources.ModelResource):
     class Meta:
         model = Survey
-        fields = ('id', 'survey_name', 'employee', 'startDatetime', 'endDatetime', 'flag')
+        fields = ('id', 'survey_name', 'employee',
+                  'startDatetime', 'endDatetime', 'flag')
         export_order = fields
 
 
 class MyUserAdmin(UserAdmin):
     model = User
-    list_display = ['username', 'first_name', 'email', 'organization']
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    list_display = ['username', 'first_name',
+                    'email', 'organization']
+    list_filter = ('is_staff', 'is_superuser',
+                   'is_active', 'groups')
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'organization', 'groups')}),
+        ('Personal info', {'fields': ('first_name',
+                                      'last_name', 'email',
+                                      'organization', 'groups')}),
     )
 
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'organization', 'groups')}),
+        ('Personal info', {'fields': ('first_name',
+                                      'last_name', 'email',
+                                      'organization', 'groups')}),
     )
     ordering = ('username',)
 
@@ -52,14 +60,20 @@ class OrganizationDetails(admin.ModelAdmin):
 
 
 class EmployeeDetails(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('id', 'emp_name', 'emp_username', 'emp_designation', 'emp_address', 'organization')
+    list_display = ('id', 'emp_name', 'emp_username',
+                    'emp_designation', 'emp_address',
+                    'organization')
     list_filter = ('emp_username',)
     fieldsets = (
-        ('Personal info', {'fields': ('emp_name', 'emp_username', 'emp_password', 'emp_designation', 'emp_address')}),
+        ('Personal info', {'fields': ('emp_name', 'emp_username',
+                                      'emp_password', 'emp_designation',
+                                      'emp_address')}),
     )
 
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Personal info', {'fields': ('emp_name', 'emp_username', 'emp_password', 'emp_designation', 'emp_address')}),
+        ('Personal info', {'fields': ('emp_name', 'emp_username',
+                                      'emp_password', 'emp_designation',
+                                      'emp_address')}),
     )
     ordering = ('emp_username',)
     resource_class = UserResource
@@ -106,17 +120,23 @@ class QuestionDetails(admin.ModelAdmin):
 
 class SurveyDetails(admin.ModelAdmin):
 
-    list_display = ('id', 'survey_name', 'description', 'startDatetime', 'endDatetime', 'status_list', 'organization')
+    list_display = ('id', 'survey_name', 'description',
+                    'startDatetime', 'endDatetime',
+                    'status_list', 'organization')
     list_filter = ('startDatetime', 'endDatetime')
 
     fieldsets = (
-        ('Survey', {'fields': ('survey_name', 'description', 'question', 'employee', 'startDatetime',
+        ('Survey', {'fields': ('survey_name',
+                               'description', 'question',
+                               'employee', 'startDatetime',
                                'endDatetime', 'flag')}),
     )
 
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Survey', {'fields': ('survey_name', 'description', 'question', 'employee', 'startDatetime', 'endDatetime',
-                               'flag')}),
+        ('Survey', {'fields': ('survey_name',
+                               'description', 'question',
+                               'employee', 'startDatetime',
+                               'endDatetime','flag')}),
     )
     ordering = ('survey_name',)
 
@@ -197,13 +217,10 @@ class AnswerDetails(admin.ModelAdmin):
 
 admin.site.register(Employee, EmployeeDetails)
 admin.site.register(Organization, OrganizationDetails)
-# admin.site.register(SurveyQuestion, SurveyQuestionDetails)
 admin.site.register(Question, QuestionDetails)
 admin.site.register(Survey, SurveyDetails)
-# admin.site.register(SurveyEmployee, SurveyEmployeeDetails)
 admin.site.register(SurveyFeedback, AnswerDetails)
 admin.site.register(User, MyUserAdmin)
-
 admin.site.site_header = 'Survey Administration'
 admin.site.site_title = "Survey Admin Portal"
 admin.site.index_title = "Welcome to Survey Admin Portal"

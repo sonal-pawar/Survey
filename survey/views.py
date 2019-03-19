@@ -3,12 +3,11 @@ This is views file contains business logic
 """
 import logging
 from smtplib import SMTPAuthenticationError
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.utils.dateparse import parse_date
 from django.utils.timezone import now
 from django.core.mail import EmailMessage
-from .models import Employee, Survey, Question, SurveyFeedback, User
+from .models import Employee, Survey, Question, SurveyFeedback
 
 
 LOGGER = logging.getLogger(__name__)
@@ -209,133 +208,3 @@ def save(request, survey_id):
                 LOGGER.exception("Email error : ")
 
     return redirect("employee")
-
-
-# def assign_survey(request, survey_id):
-#     """
-#     displaying list of assigned surveys to logged in user
-#     :param request:
-#     :param survey_id:
-#     """
-#     user_list = Employee.objects.filter(
-#         organization_id=request.user.organization)
-#     return render(request,
-#                   'survey/survey_assign.html',
-#                   {"user_list": user_list, "survey_id": survey_id})
-#
-
-# def assign_question(request, survey_id):
-#     """
-#     displaying question list of particular survey
-#     :param request:
-#     :param survey_id:
-#     """
-#     try:
-#         if request.user.organization is None:
-#             raise ConnectionError
-#         questions = Question.objects.filter(organization=request.user.organization)
-#         return render(request, 'survey/question_assign.html',
-#                       {"question_list": questions, "survey_id": survey_id})
-#     except ConnectionError:
-#         LOGGER.error("organization admin not in session")
-#
-#
-# def save_assign_survey(request):
-#     """
-#     Saving assigned survey of employee and sending mail to him
-#     :param request:
-#     """
-#
-#     if request.POST.getlist('emp_id'):
-#         for employee_id in request.POST.getlist('emp_id'):
-#             survey_employee = SurveyEmployee.objects.filter(
-#                 survey_id=request.POST['survey_id'],
-#                 employee_id=employee_id)
-#             if not survey_employee:
-#                 survey_employee_map_obj = SurveyEmployee()
-#                 survey_employee_map_obj.survey = get_object_or_404(
-#                     Survey, pk=request.POST['survey_id'])
-#                 survey_employee_map_obj.employee = get_object_or_404(
-#                     Employee, pk=employee_id)
-#                 survey_employee_map_obj.organization = request.user.organization
-#                 survey_employee_map_obj.startDatetime = parse_date(
-#                     request.POST.getlist('start-date')[1])
-#                 survey_employee_map_obj.endDatetime = parse_date(
-#                     request.POST.getlist('end-date')[1])
-#                 survey_employee_map_obj.save()
-#                 user_obj = get_object_or_404(Employee, pk=employee_id)
-#                 to_email = user_obj.emp_username
-#                 try:
-#                     email_body = "Hi, \n Your Survey Link\n"\
-#                                  + request.build_absolute_uri('/')[:-1].strip("/")\
-#                                  + "/employee"
-#                     email = EmailMessage(
-#                         'Survey Assign', email_body, to=[to_email]
-#                     )
-#                     email.send()
-#                     LOGGER.info("Email has been send to %s ", to_email)
-#                 except SMTPAuthenticationError:
-#                     LOGGER.exception("Email Error")
-#                 finally:
-#                     return redirect('surveyList')
-#     return redirect('surveyList')
-#
-#
-# def save_assign_question(request):
-#     """
-#     saving assigned questions
-#     :param request:
-#     """
-#     try:
-#         if request.POST.getlist('question_id'):
-#             for question_id in request.POST.getlist('question_id'):
-#                 survey_question = SurveyQuestion.objects.filter(
-#                     survey_id=request.POST['survey_id'],
-#                     question_id=question_id)
-#                 if not survey_question:
-#                     survey_question_map_obj = SurveyQuestion()
-#                     survey_question_map_obj.survey = get_object_or_404(
-#                         Survey, pk=request.POST['survey_id'])
-#                     survey_question_map_obj.organization = request.user.organization
-#                     survey_question_map_obj.question = get_object_or_404(
-#                         Question, pk=question_id)
-#                     survey_question_map_obj.save()
-#         return redirect('surveyList')
-#     except ConnectionError:
-#         LOGGER.log("Something went wrong")
-#
-#
-# def survey_lists(request):
-#     """
-#     displaying survey list assigned to current user
-#     :param request:
-#     """
-#     survey_list = Survey.objects.filter(organization=request.user.organization)
-#     return render(request, 'survey/survey_employee.html', {"survey_list": survey_list})
-#
-#
-# def survey_questions(request, survey_id):
-#     """
-#     displaying questions and employees list to which survey has been assigned
-#     :param request:
-#     :param survey_id:
-#     """
-#     survey_questions_list = SurveyQuestion.objects.filter(survey_id=survey_id,
-#                                                           organization=request.user.organization)
-#     survey_employee_list = SurveyEmployee.objects.filter(
-#         survey_id=survey_id,
-#         organization=request.user.organization)
-#     return render(request, 'survey/survey_questions_list.html',
-#                   {"survey_questions_list": survey_questions_list,
-#                    "survey_employee_list": survey_employee_list})
-#
-#
-# @login_required(login_url='login')
-# def report(request):
-#     """
-#     displaying report for each and every employee of respective organization
-#     :param request:
-#     """
-#     survey_data = SurveyEmployee.objects.filter(organization_id=request.user.organization)
-#     context = {'survey': survey_data}
-#     return render(request, 'survey/report.html', context)
