@@ -1,0 +1,21 @@
+{% extends 'admin/base.html' %}
+{% load staticfiles %}
+{% load i18n %}
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block extrahead %}
+  <link rel="shortcut icon" href="{%  static 'icon/fav_icon.png' %}">
+    {% endblock %}
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="{% static 'img/survey_logo.jpg' %}" height="40px" />
+    </a>
+</h1>
+{% endblock %}
+
+{% block welcome-msg %}
+            {% trans 'Welcome,' %}
+            <strong>{% firstof user.get_full_name user.get_username %}{% if user.organization is not None %} ({{ user.organization }}) {% endif %}</strong>.
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
