@@ -14,6 +14,9 @@ LOGGER = logging.getLogger(__name__)
 
 
 def login_gateway(request):
+    """
+    Login gateway for admin and employee
+    """
     return render(request, 'survey/login_gateway.html')
 
 
@@ -160,7 +163,7 @@ def save(request, survey_id):
         all_answers = SurveyFeedback.objects.filter(survey=Survey.objects.get(id=survey_id),
                                                     employee=Employee.objects.get(id=emp.id))
 
-        if name != "csrfmiddlewaretoken" and name != 'btn_response':
+        if name not in ('csrfmiddlewaretoken', 'btn_response'):
             is_record = SurveyFeedback.objects.filter(survey=Survey.objects.get(id=survey_id),
                                                       employee=Employee.objects.get(id=emp.id),
                                                       question=Question.objects.get(id=name))
