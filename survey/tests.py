@@ -1,3 +1,7 @@
+"""
+This is the test file contains all
+test cases of modules, views, middleware
+"""
 import unittest
 from django.core import mail
 from django.test import TestCase, modify_settings

@@ -21,7 +21,7 @@
 
 </head>
 
-<body class="bg-gradient-primary">
+<body style="background-image: url( {% static 'img/bg-img.jpeg' %} );  background-repeat: no-repeat;   background-size: cover;">
 
   <div class="container">
 
@@ -42,16 +42,16 @@
                   <form class="user" method="post" name="LoginForm" action="{% url 'login' %}">
                     {% csrf_token %}
                       <hr>
-                      <a href="{% url 'admin:index' %}" class="btn btn-google btn-user btn-block">
-                        <i class="fab fa-expeditedssl fa-fw"></i> Login with Admin
+                      <a href="{% url 'admin:index' %}" class="btn btn-danger btn-user btn-block">
+                        <i class="fa fa-user-lock"></i> Login with Admin
                       </a>
                        <hr>
                       <a href="{% url 'employee' %}" class="btn btn-facebook btn-user btn-block">
-                        <i class="fab fa-expeditedssl fa-fw"></i> Login with User
+                        <i class="fa fa-user-graduate"></i> Login with User
                       </a>
                       <hr>
                       <a href="https://help.surveymonkey.com/articles/en_US/kb/Web-Link-Collector" class="btn btn-primary btn-user btn-block" target="_blank">
-                        <i class="fab fa-quora fa-fw"></i> Survey Help
+                        <i class="fa fa-hands-helping"></i> Help
                       </a>
                   </form>
               </div>

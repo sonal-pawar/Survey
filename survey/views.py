@@ -3,6 +3,8 @@ This is views file contains business logic
 """
 import logging
 from smtplib import SMTPAuthenticationError
+
+from django.contrib.auth import logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.timezone import now
@@ -20,6 +22,7 @@ def login_gateway(request):
     return render(request, 'survey/login_gateway.html')
 
 
+@login_required(login_url='login')
 def question_list(request, survey_id):
     """
     displaying questions on the screen
@@ -134,7 +137,7 @@ def login(request):
     return render(request, "survey/login.html")
 
 
-def logout(request):
+def user_logout(request):
     """
     user logging out from system and deleting session
     :param request:
@@ -143,6 +146,7 @@ def logout(request):
         LOGGER.info("%s trying to log out from employee dashboard ",
                     request.session['username'])
         del request.session['username']
+        logout(request)
         LOGGER.info("logged out......")
     except KeyError:
         LOGGER.error("Error occur :  employee can't logged out ")

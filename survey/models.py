@@ -1,13 +1,9 @@
 """
 This is the database structure of survey application
 """
-import logging
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
-logging.basicConfig(format='%(asctime)s - '
-                           '%(message)s', level=logging.INFO)
 
 
 class Organization(models.Model):
@@ -17,6 +13,7 @@ class Organization(models.Model):
     company_name = models.CharField(max_length=200)
     location = models.CharField(max_length=100)
     description = models.CharField(max_length=200)
+    is_archived = models.BooleanField(default=False)
 
     def __str__(self):
         return self.company_name
@@ -140,5 +137,3 @@ class SurveyFeedback(models.Model):
     flag = models.BooleanField()
     created_date = models.DateField(auto_now_add=True)
     updated_date = models.DateField(auto_now_add=True)
-
-

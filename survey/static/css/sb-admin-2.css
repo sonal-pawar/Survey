@@ -10514,6 +10514,7 @@ a:focus {
   background-size: cover;
 }
 
+
 .bg-gradient-info {
   background-color: #36b9cc;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(10%, #36b9cc), to(#258391));
@@ -11482,8 +11483,8 @@ form.user .btn-user {
 }
 
 .btn-facebook {
-  color: #fff;
-  background-color: #3b5998;
+  color: #2A4B7C;
+  background-color:#2A4B7C;
   border-color: #fff;
 }
 

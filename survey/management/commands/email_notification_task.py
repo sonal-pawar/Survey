@@ -1,7 +1,7 @@
 import datetime
 from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
-from survey.models import SurveyEmployee, Employee
+from survey.models import Survey, Employee
 
 
 class Command(BaseCommand):
@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def send_notification_one_day_prior():
-        upcoming = SurveyEmployee.objects.filter(startDatetime=datetime.date.today() + datetime.timedelta(days=1))
+        upcoming = Survey.objects.filter(startDatetime=datetime.date.today() + datetime.timedelta(days=1))
         for employee in upcoming:
             emp = Employee.objects.get(pk=employee.employee_id)
             subject = 'You have a new survey coming tomorrow.'
@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def send_notification_on_start_date():
-        started = SurveyEmployee.objects.filter(startDatetime=datetime.date.today())
+        started = Survey.objects.filter(startDatetime=datetime.date.today())
         for employee in started:
             emp = Employee.objects.get(pk=employee.employee_id)
             subject = 'You have a new survey in your dashboard.'
@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def send_notification_one_day_before_end_date():
-        started = SurveyEmployee.objects.filter(endDatetime=datetime.date.today() + datetime.timedelta(days=1))
+        started = Survey.objects.filter(endDatetime=datetime.date.today() + datetime.timedelta(days=1))
         for employee in started:
             emp = Employee.objects.get(pk=employee.employee_id)
             subject = 'Survey assigned to you ending tomorrow.'
@@ -54,7 +54,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def send_notification_after_end_date():
-        started = SurveyEmployee.objects.filter(endDatetime__lt=datetime.date.today())
+        started = Survey.objects.filter(endDatetime__lt=datetime.date.today())
         for employee in started:
             emp = Employee.objects.get(pk=employee.employee_id)
             subject = 'Survey assigned to you was ended.'

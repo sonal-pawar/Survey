@@ -1,12 +1,15 @@
+"""
+This file handling all admin site customization
+"""
 import logging
 from smtplib import SMTPAuthenticationError
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.hashers import make_password
 from django.core.mail import EmailMessage
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from .models import Employee, Organization, Survey, Question, SurveyFeedback, User
+from django.utils.timezone import now
 
 
 LOGGER = logging.getLogger(__name__)
@@ -71,12 +74,44 @@ class MyUserAdmin(UserAdmin):
     ordering = ('username',)
 
 
+def archive_action(modeladmin, request, queryset):
+    for org in queryset:
+        org.is_archived = True
+        org.save()
+
+
+def restore_action(modeladmin, request, queryset):
+    for org in queryset:
+        org.is_archived = False
+        org.save()
+
+
+archive_action.short_description = 'Archive'
+restore_action.short_description = 'restore'
+
+
 class OrganizationDetails(admin.ModelAdmin):
     """
     Customizing organization model
     """
-    list_display = ('id', 'company_name', 'location', 'description')
+    list_display = ('id', 'company_name', 'location', 'description', 'status')
     list_filter = ('location',)
+
+    actions = [archive_action, restore_action]
+
+    def get_queryset(self, request):
+        queryset = super(OrganizationDetails, self).get_queryset(request)
+        return queryset
+
+    @staticmethod
+    def status(obj):
+        """
+        Modifying status of survey based on flag
+        """
+        if obj.is_archived is False:
+            return "Enabled"
+        else:
+            return "Archived"
 
 
 class EmployeeDetails(ImportExportModelAdmin, admin.ModelAdmin):
@@ -106,12 +141,12 @@ class EmployeeDetails(ImportExportModelAdmin, admin.ModelAdmin):
         Filtering employee details
         based on logged-in organization admin
         """
-        qs = super(EmployeeDetails, self).get_queryset(request)
+        queryset = super(EmployeeDetails, self).get_queryset(request)
         if request.user.is_superuser:
-            return qs
+            return queryset
         elif request.user.is_authenticated:
-            return qs.filter(organization_id=request.user.organization)
-        return qs
+            return queryset.filter(organization_id=request.user.organization, organization__is_archived=False)
+        return queryset
 
     def save_model(self, request, obj, form, change):
         """
@@ -152,20 +187,27 @@ class QuestionDetails(admin.ModelAdmin):
         Filtering Questions details
         based on logged-in organization admin
         """
-        qs = super(QuestionDetails, self).get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        elif request.user.is_authenticated:
-            return qs.filter(organization=request.user.organization)
-        return qs
+        try:
+            queryset = super(QuestionDetails, self).get_queryset(request)
+            if request.user.is_superuser:
+                return queryset
+            elif request.user.is_authenticated:
+                return queryset.filter(organization=request.user.organization, organization__is_archived=False)
+            return queryset
+        except Exception as e:
+            LOGGER.error("Error :", e)
 
 
 class SurveyDetails(ImportExportModelAdmin, admin.ModelAdmin):
+    """
+    Customizing Survey Model
+    """
 
     list_display = ('id', 'survey_name', 'description',
                     'get_employee',
                     'startDatetime', 'endDatetime',
-                    'status_list', 'organization')
+                    'status_list',
+                    'organization')
     list_filter = ('startDatetime', 'endDatetime')
 
     fieldsets = (
@@ -183,25 +225,27 @@ class SurveyDetails(ImportExportModelAdmin, admin.ModelAdmin):
     )
     ordering = ('survey_name',)
 
-    @staticmethod
-    def get_employee(obj):
+    def get_employee(self, obj):
         """
         Getting Employee list assigned to respective survey
         """
-        return "\n".join([p.emp_username for p in obj.employee.all()])
+        return ", ".join([p.emp_username for p in obj.employee.all()])
+    get_employee.short_description = 'employees'
 
     resource_class = SurveyResource
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
         """
         Getting questions and employees
         in many to many field based on
         current logged-in organization admin
         """
         if db_field.name == "question":
-            kwargs["queryset"] = Question.objects.filter(organization=request.user.organization)
+            kwargs["queryset"] = Question.objects.filter(organization=request.user.organization,
+                                                         organization__is_archived=False)
         if db_field.name == "employee":
-            kwargs["queryset"] = Employee.objects.filter(organization=request.user.organization)
+            kwargs["queryset"] = Employee.objects.filter(organization=request.user.organization,
+                                                         organization__is_archived=False)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def status_list(self, obj):
@@ -245,12 +289,12 @@ class SurveyDetails(ImportExportModelAdmin, admin.ModelAdmin):
         """
         Displaying survey for logged-in organization admin
         """
-        qs = super(SurveyDetails, self).get_queryset(request)
+        queryset = super(SurveyDetails, self).get_queryset(request)
         if request.user.is_superuser:
-            return qs
+            return queryset
         elif request.user.is_authenticated:
-            return qs.filter(organization=request.user.organization)
-        return qs
+            return queryset.filter(organization=request.user.organization,  organization__is_archived=False)
+        return queryset
 
 
 class AnswerDetails(admin.ModelAdmin):
@@ -296,7 +340,7 @@ class AnswerDetails(admin.ModelAdmin):
         if request.user.is_superuser:
             return query_set
         elif request.user.is_authenticated:
-            return query_set.filter(organization=request.user.organization)
+            return query_set.filter(organization=request.user.organization,  organization__is_archived=False)
         return query_set
 
 
