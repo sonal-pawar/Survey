@@ -16,7 +16,7 @@ django-crontab==0.7.1
 django-import-export==1.2.0
 django-report-builder==6.2.2
 django-widget-tweaks==1.4.3
-djangorestframework==3.9.2
+djangorestframework==3.11.2
 et-xmlfile==1.0.1
 Faker==0.9.1
 idna==2.8
